@@ -5,17 +5,12 @@ ENV LANG=C.UTF-8
 
 RUN set -x && \
     apt-get update -qq && \
-    apt-get install --no-install-recommends -qq -y git build-essential python3-dev python-is-python3 ca-certificates curl python3-pip python3-venv libtcmalloc-minimal4 && \
+    apt-get install --no-install-recommends -qq -y git build-essential python3-dev python-is-python3 ca-certificates curl python3-pip python3-venv libtcmalloc-minimal4 libgl1 libglib2.0-0 && \
     #apt-get install --no-install-recommends -qq -y ffmpeg libopencv-dev && \
     rm -rf /var/lib/apt/lists/*
 
-#ENV LD_PRELOAD=libtcmalloc.so
-
 RUN set -x && \
     git clone  https://github.com/AUTOMATIC1111/stable-diffusion-webui.git /app
-    #mkdir -p /app && \
-    #curl -sSL https://github.com/AUTOMATIC1111/stable-diffusion-webui/archive/refs/heads/master.tar.gz | tar -xzC /app --strip-components=1 && \
-    #mkdir -p /app/.git
 
 ADD ./gitconfig /app/.gitconfig
 
@@ -34,7 +29,6 @@ RUN set -x && \
 RUN echo "PermitRootLogin prohibit-password" >> /etc/ssh/sshd_config && \
     mkdir /var/run/sshd && \
     echo "root:root" | chpasswd
-
 
 USER appuser
 
@@ -114,8 +108,6 @@ USER root
 
 RUN mkdir -p /app/.cache/huggingface/accelerate/ && chown -R appuser:appuser /app/.cache
 ADD ./accellerate-default_config.yaml /app/.cache/huggingface/accelerate/default_config.yaml
-# libglib2.0-dev
-RUN set -x && apt-get -qq update && apt-get install -y libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
 
 STOPSIGNAL SIGINT
 
